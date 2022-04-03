@@ -17,7 +17,7 @@ from gui_utils import imgui_window
 from gui_utils import imgui_utils
 from gui_utils import gl_utils
 from gui_utils import text_utils
-from viz import renderer
+from viz import renderer, audio_widget
 from viz import pickle_widget
 from viz import latent_widget
 from viz import stylemix_widget
@@ -50,6 +50,7 @@ class Visualizer(imgui_window.ImguiWindow):
         # Widgets.
         self.pickle_widget      = pickle_widget.PickleWidget(self)
         self.latent_widget      = latent_widget.LatentWidget(self)
+        self.audio_widget       = audio_widget.AudioWidget(self)
         self.stylemix_widget    = stylemix_widget.StyleMixingWidget(self)
         self.trunc_noise_widget = trunc_noise_widget.TruncationNoiseWidget(self)
         self.perf_widget        = performance_widget.PerformanceWidget(self)
@@ -124,6 +125,7 @@ class Visualizer(imgui_window.ImguiWindow):
         expanded, _visible = imgui_utils.collapsing_header('Network & latent', default=True)
         self.pickle_widget(expanded)
         self.latent_widget(expanded)
+        self.audio_widget(expanded)
         self.stylemix_widget(expanded)
         self.trunc_noise_widget(expanded)
         expanded, _visible = imgui_utils.collapsing_header('Performance & capture', default=True)
@@ -288,6 +290,7 @@ def main(
         viz.load_pickle(pkls[0])
     else:
         pretrained = [
+            '/home/dj/models/stylegan3/visionary_art.pkl',
             'https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/stylegan3-r-afhqv2-512x512.pkl',
             'https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/stylegan3-r-ffhq-1024x1024.pkl',
             'https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/stylegan3-r-ffhqu-1024x1024.pkl',

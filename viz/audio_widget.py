@@ -33,19 +33,32 @@ class AudioWidget:
         self.FORMAT = pyaudio.paInt16
         self.CHANNELS = 1
         self.RATE = 44100
-        self.CHUNK = 1024 *4
+        self.CHUNK = 1024
+        self.CHUNKS = 16
 
         self.p = pyaudio.PyAudio()
+
+
+        self.chunk_idx = 0
+        self.wf_data = np.zeros((self.CHUNKS, self.CHUNK), dtype='b')
+
+
+        def callback(in_data, frame_count, time_info, status):
+            wf_data = struct.unpack(str(2 * self.CHUNK) + 'B', in_data)
+            wf_data = np.array(wf_data, dtype='b')[::2] + 128
+            self.wf_data[self.chunk_idx, :] = wf_data
+            self.chunk_idx = (self.chunk_idx + 1) % self.CHUNKS
+            return (in_data, pyaudio.paContinue)
+
         self.stream = self.p.open(
             format=self.FORMAT,
             channels=self.CHANNELS,
             rate=self.RATE,
             input=True,
-            output=True,
+            output=False,
             frames_per_buffer=self.CHUNK,
-            input_device_index=1
+            stream_callback=callback,
         )
-
     @imgui_utils.scoped_by_object_id
     def __call__(self, show=True):
         viz = self.viz
@@ -65,9 +78,8 @@ class AudioWidget:
             self.update()
 
     def update(self):
-        wf_data = self.stream.read(self.CHUNK)
-        wf_data = struct.unpack(str(2 * self.CHUNK) + 'B', wf_data)
-        wf_data = np.array(wf_data, dtype='b')[::2] + 128
+        idxs = list(range(self.chunk_idx - self.CHUNKS, self.chunk_idx))
+        wf_data =self.wf_data[idxs].reshape(-1)
 
         x = range(0, len(self.waveform))
         self.waveform[:] = np.interp(x, range(0, len(wf_data)), wf_data)
@@ -77,7 +89,7 @@ class AudioWidget:
                    8:]  # cut lower frequencies
         fft_data = np.interp(x, range(0, fft_data.shape[0]), fft_data.mean(axis=1))
 
-        self.frequencies[:] = fft_data / np.linalg.norm(fft_data)
+        self.frequencies[:] = (fft_data  - fft_data.mean()) / fft_data.std()
         self.viz.args.update(dict(latent_offset=self.frequencies))
 
         # magn = np.array(wf_data, dtype='float64') - 128.0

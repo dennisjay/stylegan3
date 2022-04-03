@@ -242,6 +242,7 @@ class Renderer:
         fft_beta        = 8,
         input_transform = None,
         untransform     = False,
+        latent_offset   = None
     ):
         # Dig up network details.
         G = self.get_network(pkl, 'G_ema')
@@ -270,6 +271,10 @@ class Renderer:
             all_zs[idx] = rnd.randn(G.z_dim)
             if G.c_dim > 0:
                 all_cs[idx, rnd.randint(G.c_dim)] = 1
+
+        # Offset
+        if latent_offset is not None:
+            all_zs[:] = latent_offset
 
         # Run mapping network.
         w_avg = G.mapping.w_avg

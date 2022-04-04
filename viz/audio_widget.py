@@ -34,7 +34,7 @@ class AudioWidget:
         self.CHANNELS = 1
         self.RATE = 44100
         self.CHUNK = 1024
-        self.CHUNKS = 16
+        self.CHUNKS = 64
 
         self.p = pyaudio.PyAudio()
 

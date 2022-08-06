@@ -88,9 +88,9 @@ class AudioWidget:
         fft_data = np.abs(librosa.stft(y=(wf_data - 128.0) / 255.0, n_fft=2048, center=False))[
                    8:]  # cut lower frequencies
         fft_data = np.interp(x, range(0, fft_data.shape[0]), fft_data.mean(axis=1))
-
-        self.frequencies[:] = (fft_data  - fft_data.mean()) / fft_data.std()
-        self.viz.args.update(dict(latent_offset=self.frequencies))
+        fft_norm = (fft_data  - fft_data.mean()) / fft_data.std()
+        self.frequencies[:] = fft_norm
+        self.viz.args.update(dict(latent_offset=fft_norm.tolist()))
 
         # magn = np.array(wf_data, dtype='float64') - 128.0
         # magn = np.abs(fft(magn))

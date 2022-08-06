@@ -291,6 +291,9 @@ def main(
     else:
         pretrained = [
             '/home/dj/models/stylegan3/visionary_art.pkl',
+            '/home/dj/models/stylegan3/mechanical-devices.pkl',
+            '/home/dj/models/stylegan3/alien_with_sunglases.pkl',
+            '/home/dj/models/stylegan3/vivid_flowers.pkl',
             'https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/stylegan3-r-afhqv2-512x512.pkl',
             'https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/stylegan3-r-ffhq-1024x1024.pkl',
             'https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/stylegan3-r-ffhqu-1024x1024.pkl',

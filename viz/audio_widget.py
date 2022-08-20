@@ -28,15 +28,16 @@ class AudioWidget:
         self.step_y = 100
 
         self.waveform = [float('nan')] * 512
-        self.frequencies = [float('nan')] * 512
+        self.frequencies =  np.zeros(512, dtype='float32')
 
         self.FORMAT = pyaudio.paInt16
         self.CHANNELS = 1
         self.RATE = 44100
         self.CHUNK = 1024
-        self.CHUNKS = 64
+        self.CHUNKS = 8
 
         self.p = pyaudio.PyAudio()
+        self.latent_np = np.zeros(512, dtype='float32')
 
 
         self.chunk_idx = 0
@@ -85,12 +86,17 @@ class AudioWidget:
         self.waveform[:] = np.interp(x, range(0, len(wf_data)), wf_data)
 
         x = range(0, len(self.frequencies))
-        fft_data = np.abs(librosa.stft(y=(wf_data - 128.0) / 255.0, n_fft=2048, center=False))[
-                   8:]  # cut lower frequencies
+        fft_data = np.abs(librosa.stft(y=(wf_data - 128.0) / 255.0, n_fft=2048, center=False)[8:])  # cut lower frequencies
         fft_data = np.interp(x, range(0, fft_data.shape[0]), fft_data.mean(axis=1))
-        fft_norm = (fft_data  - fft_data.mean()) / fft_data.std()
-        self.frequencies[:] = fft_norm
-        self.viz.args.update(dict(latent_offset=fft_norm.tolist()))
+
+
+        diff = self.latent_np - fft_data
+        self.latent_np = self.latent_np * 0.95 + diff * 0.05
+
+        self.latent_np = (self.latent_np - self.latent_np.mean()) / self.latent_np.std()
+
+        self.frequencies[:] = self.latent_np
+        self.viz.args.update(dict(latent_offset=self.latent_np.tolist()))
 
         # magn = np.array(wf_data, dtype='float64') - 128.0
         # magn = np.abs(fft(magn))

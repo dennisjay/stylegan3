@@ -261,9 +261,7 @@ def main(
     else:
         pretrained = [
             '/home/dj/models/stylegan3/visionary_art.pkl',
-            '/home/dj/models/stylegan3/mechanical-devices.pkl',
-            '/home/dj/models/stylegan3/alien_with_sunglases.pkl',
-            '/home/dj/models/stylegan3/vivid_flowers.pkl',
+            '/home/dj/models/stylegan3/pinterest_gan.pkl',
         ]
 
         # Populate recent pickles list with pretrained model URLs.
